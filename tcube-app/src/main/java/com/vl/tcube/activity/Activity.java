@@ -4,21 +4,16 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class Activity {
-    public enum Type {
-        BILLABLE,
-        OBLIGATORY_NB,
-        BREAK,
-        LEARN
-    }
-    private Type type;
+
+    private ActivityType type;
     private LocalDateTime startTime = LocalDateTime.now();
     private LocalDateTime endTime;
 
-    public Activity(Type activityType) {
+    public Activity(ActivityType activityType) {
         this.type = activityType;
     }
 
-    public Type getType() {
+    public ActivityType getType() {
         return type;
     }
 

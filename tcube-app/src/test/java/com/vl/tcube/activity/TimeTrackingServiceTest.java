@@ -27,15 +27,29 @@ class TimeTrackingServiceTest {
     }
 
     @Test
+    void startActivity_xyz() {
+        //given
+        when(activityFactory.createActivity(any())).thenReturn(activity1);
+
+        //when
+        testedClass.startActivity(10, 10, 10);
+
+        //then
+        verify(activityFactory).createActivity(ActivityType.WORK);
+        assertEquals(1, testedClass.getActivities().size());
+        assertEquals(activity1, testedClass.getActivities().get(0));
+    }
+
+    @Test
     void startActivity_FirstTime() {
         //given
         when(activityFactory.createActivity(any())).thenReturn(activity1);
 
         //when
-        testedClass.startActivity(Activity.Type.BILLABLE);
+        testedClass.startActivity(ActivityType.WORK);
 
         //then
-        verify(activityFactory).createActivity(Activity.Type.BILLABLE);
+        verify(activityFactory).createActivity(ActivityType.WORK);
         assertEquals(1, testedClass.getActivities().size());
         assertEquals(activity1, testedClass.getActivities().get(0));
     }
@@ -44,10 +58,10 @@ class TimeTrackingServiceTest {
     void startActivity_NextTimes() {
         //given
         when(activityFactory.createActivity(any())).thenReturn(activity1).thenReturn(activity2);
-        testedClass.startActivity(Activity.Type.BILLABLE);
+        testedClass.startActivity(ActivityType.WORK);
 
         //when
-        testedClass.startActivity(Activity.Type.BILLABLE);
+        testedClass.startActivity(ActivityType.WORK);
 
         //then
         verify(activity1).stop();

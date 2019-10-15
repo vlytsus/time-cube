@@ -1,7 +1,7 @@
 package com.vl.tcube.activity;
 
 public class ActivityFactory {
-    public Activity createActivity(Activity.Type activityType){
+    public Activity createActivity(ActivityType activityType){
         return new Activity(activityType);
     }
 }

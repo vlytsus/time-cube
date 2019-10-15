@@ -12,10 +12,12 @@ public class TimeTrackingService {
     }
 
     public void startActivity(int xLevel, int yLevel, int zLevel){
-        startActivity(convertLevelsToActiviyType(xLevel, yLevel, zLevel));
+        System.out.println(xLevel + ":" + yLevel + ":" + zLevel);
+        ActivityType type = ActivityType.getActivityType(xLevel, yLevel, zLevel);
+        startActivity(type);
     }
 
-    public void startActivity(Activity.Type activityType){
+    public void startActivity(ActivityType activityType){
         stopCurrentActivity();
         Activity newActivity = activityFactory.createActivity(activityType);
         activities.add(newActivity);
@@ -23,14 +25,6 @@ public class TimeTrackingService {
 
     public List<Activity> getActivities(){
         return activities;
-    }
-
-    private Activity.Type convertLevelsToActiviyType(int xLevel, int yLevel, int zLevel){
-        if(xLevel < 50 && yLevel < 50) {
-            return Activity.Type.BILLABLE;
-        } else {
-            return Activity.Type.BREAK;
-        }
     }
 
     private void stopCurrentActivity(){
