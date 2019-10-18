@@ -5,10 +5,11 @@ import gnu.io.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
+import java.util.Queue;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class SerialListener {
+public class SerialListener implements Runnable {
 
     public static final char MESSAGE_START_MARKER = '<';
     public static final int MESSAGE_MAX_LEN = 14;
@@ -17,17 +18,42 @@ public class SerialListener {
     public static final int COMMUNICATION_BAUD_RATE = 9600;
     public static final int PORT_TYPE = 2000;
 
+    public SerialListener(){
+
+    }
+
+    public SerialListener(Queue<CubePositionMessage> messagesQueue){
+      this.messagesQueue = messagesQueue;
+    }
+
     private AtomicBoolean active = new AtomicBoolean(true);
+    private Queue<CubePositionMessage> messagesQueue;
 
     public void stopCommunication(){
         active.set(false);
+    }
+
+    public boolean isActive(){
+        return active.get();
+    }
+
+    @Override
+    public void run() {
+        try{
+            while(isActive()){
+                startCommunication();
+                Thread.sleep(1000);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void startCommunication() throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException {
         InputStream in = null;
         CommPort port = null;
         try {
-            while ( active.get() ) {
+            while ( isActive() ) {
                 if(in == null) {
                     closeConnection(in, port);
                     port = tryToConnectToFirstAvailablePort();
@@ -64,6 +90,9 @@ public class SerialListener {
                 }
                 String message = sb.toString();
                 CubePositionMessage msg = parseToken(in, message);
+                if(messagesQueue != null){
+                    messagesQueue.add(msg);
+                }
                 log(msg.getxPos(), msg.getyPos(), msg.getzPos());
             }
         } catch ( Exception e ) {
@@ -158,15 +187,8 @@ public class SerialListener {
     }
 
     public static void main(String[] args){
-        try {
-            SerialListener listener = new SerialListener();
-            while(true){
-                listener.startCommunication();
-                Thread.sleep(1000);
-            }
+        SerialListener listener = new SerialListener();
+        listener.run();
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

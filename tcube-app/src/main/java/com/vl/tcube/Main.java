@@ -1,5 +1,8 @@
 package com.vl.tcube;
 
+import com.google.common.collect.Queues;
+import com.vl.tcube.comm.CubePositionMessage;
+import com.vl.tcube.comm.SerialListener;
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
@@ -17,10 +20,13 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import com.google.common.collect.EvictingQueue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
+import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Main extends Application {
@@ -55,7 +61,6 @@ public class Main extends Application {
         TextField textField4 = new TextField ();
 
         HBox hb = new HBox(10);
-
         VBox vb = new VBox(10);
         vb.getChildren().addAll(label1, textField1);
         vb.getChildren().addAll(label2, textField2);
@@ -69,13 +74,18 @@ public class Main extends Application {
         hb.setAlignment(Pos.CENTER);
 
         primaryStage.show();
-
-
-
     }
 
-
     public static void main(String[] args) {
+        EvictingQueue<CubePositionMessage> queue = EvictingQueue.create(10);
+        Queue<CubePositionMessage> syncQueue =  Queues.synchronizedQueue(queue);
+
+        SerialListener listener = new SerialListener(syncQueue);
+        Thread threadListener = new Thread(listener);
+
+        threadListener.start();
         launch(args);
+        queue.parallelStream().forEach(pos -> System.out.println(pos.getxPos()));
+        listener.stopCommunication();
     }
 }
