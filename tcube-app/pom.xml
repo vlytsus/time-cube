@@ -12,16 +12,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.ardulink</groupId>
-            <artifactId>ardulink-core-base</artifactId>
-            <version>2.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.ardulink</groupId>
-            <artifactId>ardulink-core-serial-rxtx</artifactId>
-            <version>2.1.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.5.2</version>
@@ -44,6 +34,11 @@
             <artifactId>mockito-junit-jupiter</artifactId>
             <version>3.1.0</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>mfizz.com</groupId>
+            <artifactId>mfz-rxtx</artifactId>
+            <version>2.2.0</version>
         </dependency>
     </dependencies>
 </project>
