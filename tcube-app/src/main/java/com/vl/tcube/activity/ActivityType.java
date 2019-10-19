@@ -7,7 +7,8 @@ public enum ActivityType {
     REST,
     WORK,
     SHORES,
-    LEARN;
+    LEARN,
+    UNDEFINED;
 
     private final static String APP_CONFIG = "app.properties";
     private int xStart;
@@ -56,6 +57,6 @@ public enum ActivityType {
                 return type;
             }
         }
-        return REST;
+        return UNDEFINED;
     }
 }

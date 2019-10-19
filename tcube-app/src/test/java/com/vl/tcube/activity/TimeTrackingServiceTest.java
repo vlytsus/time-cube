@@ -23,7 +23,7 @@ class TimeTrackingServiceTest {
     private TimeTrackingService testedClass;
     @BeforeEach
     void setUp() {
-        testedClass = new TimeTrackingService(activityFactory);
+        //testedClass = new TimeTrackingService(activityFactory);
     }
 
     @Test
