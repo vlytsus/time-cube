@@ -26,10 +26,10 @@ public class Activity {
     }
 
     public Duration getDuration() {
-        return Duration.between(endTime, startTime);
+        return Duration.between(startTime, endTime);
     }
 
-    public void stop(){
+    public void prolong(){
         endTime = LocalDateTime.now();
     }
 }

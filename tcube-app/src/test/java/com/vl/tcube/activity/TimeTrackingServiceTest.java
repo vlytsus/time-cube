@@ -4,9 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Duration;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,7 +23,11 @@ class TimeTrackingServiceTest {
     private TimeTrackingService testedClass;
     @BeforeEach
     void setUp() {
-        //testedClass = new TimeTrackingService(activityFactory);
+        testedClass = new TimeTrackingService(activityFactory);
+        lenient().when(activity1.getType()).thenReturn(ActivityType.WORK);
+        lenient().when(activity1.getDuration()).thenReturn(Duration.ofMinutes(1));
+        lenient().when(activity2.getType()).thenReturn(ActivityType.REST);
+        lenient().when(activity2.getDuration()).thenReturn(Duration.ofMinutes(1));
     }
 
     @Test
@@ -58,15 +62,16 @@ class TimeTrackingServiceTest {
     void startActivity_NextTimes() {
         //given
         when(activityFactory.createActivity(any())).thenReturn(activity1).thenReturn(activity2);
-        testedClass.startActivity(ActivityType.WORK);
 
         //when
         testedClass.startActivity(ActivityType.WORK);
+        testedClass.startActivity(ActivityType.WORK);
 
         //then
-        verify(activity1).stop();
-        verify(activity2, never()).stop();
-        assertEquals(2, testedClass.getActivities().size());
+        verify(activity1).prolong();
+        verify(activity2, never()).prolong();
+
+        assertEquals(1, testedClass.getActivities().size());//if activity type is not changed then ruse previous activity
     }
 
     @Test

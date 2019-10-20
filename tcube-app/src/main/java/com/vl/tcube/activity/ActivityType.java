@@ -59,4 +59,28 @@ public enum ActivityType {
         }
         return UNDEFINED;
     }
+
+    public int getxStart() {
+        return xStart;
+    }
+
+    public int getxEnd() {
+        return xEnd;
+    }
+
+    public int getyStart() {
+        return yStart;
+    }
+
+    public int getyEnd() {
+        return yEnd;
+    }
+
+    public int getzStart() {
+        return zStart;
+    }
+
+    public int getzEnd() {
+        return zEnd;
+    }
 }

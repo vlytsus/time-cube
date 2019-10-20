@@ -1,13 +1,15 @@
 package com.vl.tcube.activity;
 
-import javafx.application.Platform;
-
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * That class keeps history of activity changes
+ * and statistic about whole activity duration
+ */
 public class TimeTrackingService {
-    private final List<Activity> activities;
+    private List<Activity> activities;
     private Duration workDuration;
     private Duration learnDuration;
     private Duration shoresDuration;
@@ -16,9 +18,17 @@ public class TimeTrackingService {
     private ActivityFactory activityFactory;
 
     public TimeTrackingService(ActivityFactory activityFactory){
-        this.activities = new ArrayList<>();
         this.activityFactory = activityFactory;
+        reset();
+    }
 
+    /**
+     * This function might be used
+     * to reset data & statistics when
+     * new day begins
+     */
+    public void reset(){
+        activities = new ArrayList<>();
         workDuration = Duration.ofMinutes(1);
         learnDuration = Duration.ofMinutes(1);
         shoresDuration = Duration.ofMinutes(1);
@@ -26,36 +36,35 @@ public class TimeTrackingService {
     }
 
     public void startActivity(int xLevel, int yLevel, int zLevel){
-        System.out.println(xLevel + ":" + yLevel + ":" + zLevel);
         ActivityType type = ActivityType.getActivityType(xLevel, yLevel, zLevel);
         startActivity(type);
     }
 
     public void startActivity(ActivityType activityType){
         Activity currentActivity = getCurrentActivity();
-        if(currentActivity != null){
-            currentActivity.stop();
-            updateStatistic(currentActivity);
+        if(currentActivity != null && currentActivity.getType() == activityType){
+            currentActivity.prolong();
+        } else {
+            currentActivity = activityFactory.createActivity(activityType);
+            activities.add(currentActivity);
         }
-
-        Activity newActivity = activityFactory.createActivity(activityType);
-        Platform.runLater(() -> activities.add(newActivity));
+        updateStatistic(currentActivity);
     }
 
     private void updateStatistic(Activity currentActivity) {
         Duration currentDuration = currentActivity.getDuration();
         switch(currentActivity.getType()){
             case WORK:
-                getWorkDuration().plus(currentDuration);
+                workDuration = workDuration.plus(currentDuration);
                 break;
             case LEARN:
-                getLearnDuration().plus(currentDuration);
+                learnDuration = learnDuration.plus(currentDuration);
                 break;
             case SHORES:
-                getShoresDuration().plus(currentDuration);
+                shoresDuration = shoresDuration.plus(currentDuration);
                 break;
             case REST:
-                getRestDuration().plus(currentDuration);
+                restDuration = restDuration.plus(currentDuration);
                 break;
         }
     }
@@ -64,7 +73,7 @@ public class TimeTrackingService {
         return activities;
     }
 
-    private Activity getCurrentActivity(){
+    public Activity getCurrentActivity(){
         if(!activities.isEmpty()) {
             return activities.get(activities.size() - 1);
         }

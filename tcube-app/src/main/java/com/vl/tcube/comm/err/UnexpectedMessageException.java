@@ -1,4 +1,4 @@
-package com.vl.tcube.comm;
+package com.vl.tcube.comm.err;
 
 public class UnexpectedMessageException extends RuntimeException {
 

@@ -1,20 +1,21 @@
 package com.vl.tcube.comm;
 
-import com.vl.tcube.activity.Activity;
 import com.vl.tcube.activity.ActivityType;
 import com.vl.tcube.activity.TimeTrackingService;
+import com.vl.tcube.comm.err.CommunicationClosedException;
+import com.vl.tcube.comm.err.UnexpectedMessageException;
 import gnu.io.*;
-import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.StringTokenizer;
 
-public class SerialListenerService extends Service<Void> {
+public class GyroSerialListenerService extends Service<Void> implements ObservableService {
 
     public static final char MESSAGE_START_MARKER = '<';
     public static final int MESSAGE_MAX_LEN = 14;
@@ -27,7 +28,7 @@ public class SerialListenerService extends Service<Void> {
     private List<CommunicationObserver> observers = new ArrayList<>();
     private Runnable updater;
 
-    public SerialListenerService(TimeTrackingService timeService){
+    public GyroSerialListenerService(TimeTrackingService timeService){
         this.timeService = timeService;
     }
 
@@ -76,7 +77,6 @@ public class SerialListenerService extends Service<Void> {
                         }
                         String message = sb.toString();
                         CubePositionMessage msg = parseToken(in, message);
-                        timeService.startActivity(msg.getxPos(), msg.getyPos(), msg.getzPos());
                         notifyObservers(msg);
                         log(msg.getxPos(), msg.getyPos(), msg.getzPos());
                     }
@@ -91,10 +91,12 @@ public class SerialListenerService extends Service<Void> {
         };
     }
 
+    @Override
     public void addCommunicationObserver(CommunicationObserver observer){
         observers.add(observer);
     }
 
+    @Override
     public List<CommunicationObserver> getCommunicationObservers(){
         return observers;
     }
