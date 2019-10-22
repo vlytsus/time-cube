@@ -13,3 +13,12 @@ Arduino part just collects XYZ positions of the cube nad sends it so serial port
 
 ## Useful materials
 [How To Track Orientation with Arduino and ADXL345 Accelerometer](https://howtomechatronics.com/tutorials/arduino/how-to-track-orientation-with-arduino-and-adxl345-accelerometer)
+
+## Future plans
+* Blink LED in "Rest" mode to keep attention and not forget to flip it back to work when you returns from the coffee break
+* Blink LED if htere is new email/calendar event.
+* Blink LED after 1h of work to go for a short walk or drink a cup of water and to not sit still.
+* Make wireless version of Time Cube (Bluetooth or WiFi)
+* Add ability to manually correct statistics.
+* Add day graph with statistics
+* TODO
