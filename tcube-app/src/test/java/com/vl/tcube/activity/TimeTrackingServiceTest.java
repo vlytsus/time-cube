@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,7 +16,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TimeTrackingServiceTest {
-
+    @Mock Activity activityUndef;
     @Mock Activity activity1;
     @Mock Activity activity2;
     @Mock ActivityFactory activityFactory;
@@ -23,11 +24,23 @@ class TimeTrackingServiceTest {
     private TimeTrackingService testedClass;
     @BeforeEach
     void setUp() {
-        testedClass = new TimeTrackingService(activityFactory);
+        lenient().when(activityUndef.getType()).thenReturn(ActivityType.UNDEFINED);
+        lenient().when(activityUndef.getStartTime()).thenReturn(LocalDateTime.of(2019, 1, 1, 14, 5));
+        lenient().when(activityFactory.createActivity()).thenReturn(activityUndef);
         lenient().when(activity1.getType()).thenReturn(ActivityType.WORK);
-        //lenient().when(activity1.getDuration()).thenReturn(Duration.ofMinutes(1));
+        lenient().when(activity1.getStartTime()).thenReturn(LocalDateTime.of(2019, 1, 1, 14, 10));
         lenient().when(activity2.getType()).thenReturn(ActivityType.REST);
-        //lenient().when(activity2.getDuration()).thenReturn(Duration.ofMinutes(1));
+        lenient().when(activity2.getStartTime()).thenReturn(LocalDateTime.of(2019, 1, 1, 14, 15));
+        testedClass = new TimeTrackingService(activityFactory);
+    }
+
+    @Test
+    void getActivities_one_activity_is_always_created() {
+        //when
+        List<Activity> activities = testedClass.getActivities();
+        //then
+        assertEquals(1, testedClass.getActivities().size());
+        assertEquals(activityUndef, testedClass.getActivities().get(0));
     }
 
     @Test
@@ -40,8 +53,8 @@ class TimeTrackingServiceTest {
 
         //then
         verify(activityFactory).createActivity(ActivityType.WORK);
-        assertEquals(1, testedClass.getActivities().size());
-        assertEquals(activity1, testedClass.getActivities().get(0));
+        assertEquals(2, testedClass.getActivities().size());
+        assertEquals(activity1, testedClass.getActivities().get(1));
     }
 
     @Test
@@ -54,12 +67,13 @@ class TimeTrackingServiceTest {
 
         //then
         verify(activityFactory).createActivity(ActivityType.WORK);
-        assertEquals(1, testedClass.getActivities().size());
-        assertEquals(activity1, testedClass.getActivities().get(0));
+        assertEquals(2, testedClass.getActivities().size());
+        assertEquals(activityUndef, testedClass.getActivities().get(0));
+        assertEquals(activity1, testedClass.getActivities().get(1));
     }
 
     @Test
-    void startActivity_NextTimes() {
+    void startActivity_Next_Same_Type() {
         //given
         when(activityFactory.createActivity(any())).thenReturn(activity1).thenReturn(activity2);
 
@@ -68,18 +82,19 @@ class TimeTrackingServiceTest {
         testedClass.startActivity(ActivityType.WORK);
 
         //then
-        //verify(activity1).prolong();
-        //verify(activity2, never()).prolong();
-
-        assertEquals(1, testedClass.getActivities().size());//if activity type is not changed then ruse previous activity
+        assertEquals(2, testedClass.getActivities().size());//if activity type is not changed then ruse previous activity
     }
 
     @Test
-    void getActivities() {
-        //when
-        List<Activity> activities = testedClass.getActivities();
-        //then
-        assertNotNull(activities);
-    }
+    void startActivity_Next_Other_Type() {
+        //given
+        when(activityFactory.createActivity(any())).thenReturn(activity1).thenReturn(activity2);
 
+        //when
+        testedClass.startActivity(ActivityType.WORK);
+        testedClass.startActivity(ActivityType.REST);
+
+        //then
+        assertEquals(3, testedClass.getActivities().size());//if activity type is not changed then ruse previous activity
+    }
 }
