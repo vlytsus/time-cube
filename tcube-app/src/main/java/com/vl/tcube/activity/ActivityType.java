@@ -6,7 +6,7 @@ import java.util.Properties;
 public enum ActivityType {
     REST,
     WORK,
-    SHORES,
+    CHORES,
     LEARN,
     UNDEFINED;
 

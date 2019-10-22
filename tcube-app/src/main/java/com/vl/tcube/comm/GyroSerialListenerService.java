@@ -7,6 +7,8 @@ import com.vl.tcube.comm.err.UnexpectedMessageException;
 import gnu.io.*;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +18,8 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 public class GyroSerialListenerService extends Service<Void> implements ObservableService {
+
+    static final Logger logger = LoggerFactory.getLogger(GyroSerialListenerService.class);
 
     public static final char MESSAGE_START_MARKER = '<';
     public static final int MESSAGE_MAX_LEN = 14;
@@ -78,14 +82,15 @@ public class GyroSerialListenerService extends Service<Void> implements Observab
                         String message = sb.toString();
                         CubePositionMessage msg = parseToken(in, message);
                         notifyObservers(msg);
-                        log(msg.getxPos(), msg.getyPos(), msg.getzPos());
+                        logger.debug(msg.getxPos() + ":" + msg.getyPos() + ":" + msg.getzPos());
                     }
                 } catch ( Exception e ) {
                     e.printStackTrace();
+                    logger.error("Connection error: ", e);
                 } finally {
                     closeConnection(in, port);
                 }
-                log("Communication ended");
+                logger.info("Communication ended");
                 return null;
             }
         };
@@ -125,21 +130,12 @@ public class GyroSerialListenerService extends Service<Void> implements Observab
         if(portName == null){
             throw new CommunicationClosedException();
         }
-        log("Try to connect to", portName);
+        logger.debug("Try to connect to", portName);
         CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
         CommPort commPort = portIdentifier.open(this.getClass().getName(), PORT_TYPE);
 
-        log("Connected to", portName);
+        logger.info("Connected to", portName);
         return commPort;
-    }
-    
-    private void log(Object... args){
-        //TODO replace with logger
-        for(Object param : args){
-            System.out.print(param);
-            System.out.print(": ");
-        }
-        System.out.println();
     }
 
     private String getPortName(){
@@ -150,7 +146,7 @@ public class GyroSerialListenerService extends Service<Void> implements Observab
                 cpi = (CommPortIdentifier) ports.nextElement();
                 return cpi.getName();
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("getPortName error:", e);
             }
         }
         return null;
@@ -186,10 +182,11 @@ public class GyroSerialListenerService extends Service<Void> implements Observab
                 return null;
             }
             CubePositionMessage msg = new CubePositionMessage(xVal, yVal, zVal);
-            log(ActivityType.getActivityType(xVal, yVal, zVal).name());
+            logger.debug("parseToken proceed message:", ActivityType.getActivityType(xVal, yVal, zVal).name());
             return msg;
 
-        } catch(NumberFormatException ignore) {
+        } catch(NumberFormatException e) {
+            logger.error("parseToken error:", e);
             throw new UnexpectedMessageException("Invalid message received: " + message);
         }
     }

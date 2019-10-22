@@ -1,13 +1,15 @@
 package com.vl.tcube.activity;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class Activity {
 
     private ActivityType type;
     private LocalDateTime startTime = LocalDateTime.now();
-    private LocalDateTime endTime;
+
+    public Activity() {
+        this.type = ActivityType.UNDEFINED;
+    }
 
     public Activity(ActivityType activityType) {
         this.type = activityType;
@@ -19,17 +21,5 @@ public class Activity {
 
     public LocalDateTime getStartTime() {
         return startTime;
-    }
-
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
-
-    public Duration getDuration() {
-        return Duration.between(startTime, endTime);
-    }
-
-    public void prolong(){
-        endTime = LocalDateTime.now();
     }
 }

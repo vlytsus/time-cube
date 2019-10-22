@@ -75,7 +75,7 @@ public class WorkdaySimulatorService extends Thread implements ObservableService
 
     private void simulateShores(int i) {
         if(i > 60 && i < 70) {
-            yPos = ActivityType.SHORES.getyStart() + 1;
+            yPos = ActivityType.CHORES.getyStart() + 1;
         }
     }
 
