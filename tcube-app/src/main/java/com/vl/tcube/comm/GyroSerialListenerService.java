@@ -31,6 +31,7 @@ public class GyroSerialListenerService extends Service<Void> implements Observab
     private TimeTrackingService timeService;
     private List<CommunicationObserver> observers = new ArrayList<>();
     private Runnable updater;
+    private String preferPort;
 
     public GyroSerialListenerService(TimeTrackingService timeService){
         this.timeService = timeService;
@@ -141,14 +142,18 @@ public class GyroSerialListenerService extends Service<Void> implements Observab
     private String getPortName(){
         CommPortIdentifier cpi = null;
         Enumeration ports = CommPortIdentifier.getPortIdentifiers();
+        logger.debug("Prefer port: " + preferPort);
         while (ports.hasMoreElements()) {
             try {
                 cpi = (CommPortIdentifier) ports.nextElement();
-                return cpi.getName();
+                if(cpi.getName().contains(preferPort)) {
+                    return cpi.getName();
+                }
             } catch (Exception e) {
                 logger.error("getPortName error:", e);
             }
         }
+        logger.warn("No preferred port found: " + preferPort);
         return null;
     }
 
