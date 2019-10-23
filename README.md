@@ -22,3 +22,11 @@ Arduino part just collects XYZ positions of the cube nad sends it so serial port
 * Add ability to manually correct statistics.
 * Add day graph with statistics
 * TODO
+
+## How to build executable jar
+run
+```
+mvn clean package
+```
+Then copy generated tcube-1.0.0-SNAPSHOT.jar and /lib folder from /target to desired destination.
+Also please copy rxtxSerial.dll together with tcube-1.0.0-SNAPSHOT.jar to the same destination.
