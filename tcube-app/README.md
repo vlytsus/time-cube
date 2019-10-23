@@ -1,4 +1,4 @@
-### Java Application
+## Java Application
 
 Application to connect and control Time Cube from PC
 
@@ -13,7 +13,7 @@ To install jar you have to call:
 ```bash
 mvn install:install-file -Dfile=RXTXcomm.jar -DgroupId=mfizz.com -DartifactId=mfz-rxtx -Dversion=2.2.0 -Dpackaging=jar
 ```
-## How to build executable jar
+### How to build executable jar
 To compile sources and all dependencies plese call:
 ```
 mvn clean package
