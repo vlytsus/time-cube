@@ -17,7 +17,8 @@ Application writes comma-separated events log to time-log.csv file. It can be us
 * USB cable
 
 ## Useful materials
-[How To Track Orientation with Arduino and ADXL345 Accelerometer](https://howtomechatronics.com/tutorials/arduino/how-to-track-orientation-with-arduino-and-adxl345-accelerometer)
+* [How To Track Orientation with Arduino and ADXL345 Accelerometer](https://howtomechatronics.com/tutorials/arduino/how-to-track-orientation-with-arduino-and-adxl345-accelerometer)
+* [Java serial connection to Arduino](https://playground.arduino.cc/Interfacing/Java/)
 
 ## Future plans
 * Blink LED in "Rest" mode to keep attention and not forget to flip it back to work when you returns from the coffee break
