@@ -24,9 +24,12 @@ Arduino part just collects XYZ positions of the cube nad sends it so serial port
 * TODO
 
 ## How to build executable jar
-run
+To compile sources and all dependencies plese call:
 ```
 mvn clean package
 ```
-Then copy generated tcube-1.0.0-SNAPSHOT.jar and /lib folder from /target to desired destination.
-Also please copy rxtxSerial.dll together with tcube-1.0.0-SNAPSHOT.jar to the same destination.
+Then copy following files to desired place:
+* run.bat
+* rxtxSerial.dll
+* /target/tcube-1.0.0-SNAPSHOT.jar 
+* /target/lib
