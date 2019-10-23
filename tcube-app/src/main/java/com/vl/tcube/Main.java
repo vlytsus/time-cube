@@ -26,9 +26,6 @@ import java.util.Properties;
 
 public class Main extends Application {
 
-    private final static String APP_CONFIG = "app.properties";
-    private final static String PREFER_PORT_CONFIG = "prefer.port";
-
     static final Logger logger = LoggerFactory.getLogger(Main.class);
     static final Logger activityLog = LoggerFactory.getLogger("ACTIVITY_LOG");
     private TextField choresField = new TextField ();
@@ -36,18 +33,15 @@ public class Main extends Application {
     private TextField restField = new TextField ();
     private TextField learnField = new TextField ();
     private TextArea textArea = new TextArea();
-    private Properties properties;
     private TimeTrackingService timeService;
     private ObservableService gyroSerialListenerService;
 
     public Main() {
-        try {
-            timeService = new TimeTrackingService(new ActivityFactory());
-            gyroSerialListenerService = //new WorkdaySimulatorService();
-                    new GyroSerialListenerService(timeService, readConfig().getProperty(PREFER_PORT_CONFIG));
-        } catch (IOException e) {
-            logger.error("Program error: ", e);
-        }
+        AppConfig config = new AppConfig();
+        timeService = new TimeTrackingService(new ActivityFactory());
+        gyroSerialListenerService = //new WorkdaySimulatorService();
+                new GyroSerialListenerService(timeService, config.getPreferPort());
+
     }
 
     @Override
@@ -135,18 +129,7 @@ public class Main extends Application {
         return String.format("%dh %02dm %02ds", seconds / 3600, (seconds % 3600) / 60, (seconds % 60));
     }
 
-    private Properties readConfig() throws IOException {
-        try {
-            properties = new Properties();
-            InputStream inputStream = getClass().getClassLoader().getResourceAsStream(APP_CONFIG);
-            properties.load(inputStream);
-            return properties;
 
-        } catch (Exception ex){
-            logger.error("readConfig error: ", ex);
-            throw ex;
-        }
-    }
 
     public static void main(String[] args) {
         launch(args);
