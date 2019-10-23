@@ -145,7 +145,7 @@ public class GyroSerialListenerService extends Service<Void> implements Observab
         CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
         CommPort commPort = portIdentifier.open(this.getClass().getName(), PORT_TYPE);
 
-        logger.info("Connected to", portName);
+        logger.info("Connected to " + portName);
         return commPort;
     }
 

@@ -20,7 +20,7 @@ public class TimeTrackingService {
     private Duration learnDuration;
     private Duration choresDuration;
     private Duration restDuration;
-    private LocalDateTime lastUpdate;
+    private LocalDateTime lastUpdate = LocalDateTime.now();
     static final Logger logger = LoggerFactory.getLogger(TimeTrackingService.class);
 
     private ActivityFactory activityFactory;

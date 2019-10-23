@@ -44,6 +44,9 @@ public class Main extends Application {
         gyroSerialListenerService = //new WorkdaySimulatorService();
                 new GyroSerialListenerService(timeService, config.getPreferPort());
 
+        textArea.setText("============================");
+        new TextAreaAppender().setTextArea(textArea);
+
         gyroSerialListenerService.addCommunicationObserver(new CommunicationObserver() {
             @Override
             public void onCubePositionMessage(CubePositionMessage msg) {
@@ -53,9 +56,6 @@ public class Main extends Application {
                         timeService.startActivity(msg.getxPos(), msg.getyPos(), msg.getzPos());
                         Activity currentActivity = timeService.getCurrentActivity();
                         activityLog.info(currentActivity.getType().name());
-                        if(currentActivity != null){
-                            textArea.setText(LocalDateTime.now() + " : " + currentActivity.getType().name() + "\r\n" + textArea.getText());
-                        }
                         choresField.setText(formatDuration(timeService.getChoresDuration()));
                         workField.setText(formatDuration(timeService.getWorkDuration()));
                         restField.setText(formatDuration(timeService.getRestDuration()));
