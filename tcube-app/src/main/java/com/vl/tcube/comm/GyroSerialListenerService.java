@@ -33,8 +33,9 @@ public class GyroSerialListenerService extends Service<Void> implements Observab
     private Runnable updater;
     private String preferPort;
 
-    public GyroSerialListenerService(TimeTrackingService timeService){
+    public GyroSerialListenerService(TimeTrackingService timeService, String preferPort){
         this.timeService = timeService;
+        this.preferPort = preferPort;
     }
 
     @Override
@@ -44,57 +45,66 @@ public class GyroSerialListenerService extends Service<Void> implements Observab
             protected Void call() {
                 InputStream in = null;
                 CommPort port = null;
-                try {
-                    while ( !isCancelled() ) {
-                        if(in == null) {
+                while ( !isCancelled() ) {
+                    try {
+                        if (in == null) {
                             closeConnection(in, port);
                             port = tryToConnectToFirstAvailablePort();
                             in = port.getInputStream();
                             continue;
+                        } else {
+                            readPortData(in);
+                            Thread.sleep(100);
                         }
-
-                        int ch = in.read();
-                        if(ch == END_OF_STREAM){
-                            Thread.yield();
-                            continue;
-                        }
-                        if(ch != MESSAGE_START_MARKER){//skip all characters until first message start
-                            continue;
-                        }else{
-                            ch = in.read();
-                            if(ch == END_OF_STREAM){//double check that we are not reached end of stream
-                                Thread.yield();
-                                continue;
-                            }
-                        }
-                        StringBuilder sb = new StringBuilder(MESSAGE_MAX_LEN);
-                        sb.append((char)ch);
-                        while ( ( ch = in.read()) != END_OF_STREAM ){
-                            if(ch == END_OF_MESSAGE_MARKER){
-                                break;
-                            }else{
-                                sb.append((char)ch);
-                                if(sb.length() > MESSAGE_MAX_LEN){
-                                    //that message is probably broken. Just skip and wait for another
-                                    break;
-                                }
-                            }
-                        }
-                        String message = sb.toString();
-                        CubePositionMessage msg = parseToken(in, message);
-                        notifyObservers(msg);
-                        logger.debug(msg.getxPos() + ":" + msg.getyPos() + ":" + msg.getzPos());
+                    } catch (Exception e) {
+                        logger.info("Communication error: " + e.getMessage());
+                        closeConnection(in, port);
+                        in = null;
+                        port = null;
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ignore) {}
                     }
-                } catch ( Exception e ) {
-                    e.printStackTrace();
-                    logger.error("Connection error: ", e);
-                } finally {
-                    closeConnection(in, port);
                 }
                 logger.info("Communication ended");
                 return null;
             }
         };
+    }
+
+    private void readPortData(InputStream in) throws IOException {
+        int ch = in.read();
+        if (ch == END_OF_STREAM) {
+            Thread.yield();
+            return;
+        }
+        if (ch != MESSAGE_START_MARKER) {//skip all characters until first message start
+            return;
+        } else {
+            ch = in.read();
+            if (ch == END_OF_STREAM) {//double check that we are not reached end of stream
+                Thread.yield();
+                return;
+            }
+        }
+        StringBuilder sb = new StringBuilder(MESSAGE_MAX_LEN);
+        sb.append((char) ch);
+        while ((ch = in.read()) != END_OF_STREAM) {
+            if (ch == END_OF_MESSAGE_MARKER) {
+                break;
+            } else {
+                sb.append((char) ch);
+                if (sb.length() > MESSAGE_MAX_LEN) {
+                    //that message is probably broken. Just skip and wait for another
+                    break;
+                }
+            }
+        }
+        String message = sb.toString();
+        CubePositionMessage msg = parseToken(in, message);
+        notifyObservers(msg);
+        logger.debug(msg.getxPos() + ":" + msg.getyPos() + ":" + msg.getzPos());
+
     }
 
     @Override
@@ -117,7 +127,7 @@ public class GyroSerialListenerService extends Service<Void> implements Observab
             try {
                 in.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("closeConnection:", e);
             }
         }
         if(port != null){

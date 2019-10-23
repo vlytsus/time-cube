@@ -3,10 +3,7 @@ package com.vl.tcube;
 import com.vl.tcube.activity.Activity;
 import com.vl.tcube.activity.ActivityFactory;
 import com.vl.tcube.activity.TimeTrackingService;
-import com.vl.tcube.comm.CommunicationObserver;
-import com.vl.tcube.comm.CubePositionMessage;
-import com.vl.tcube.comm.ObservableService;
-import com.vl.tcube.comm.WorkdaySimulatorService;
+import com.vl.tcube.comm.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -21,10 +18,16 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Properties;
 
 public class Main extends Application {
+
+    private final static String APP_CONFIG = "app.properties";
+    private final static String PREFER_PORT_CONFIG = "prefer.port";
 
     static final Logger logger = LoggerFactory.getLogger(Main.class);
     static final Logger activityLog = LoggerFactory.getLogger("ACTIVITY_LOG");
@@ -33,10 +36,19 @@ public class Main extends Application {
     private TextField restField = new TextField ();
     private TextField learnField = new TextField ();
     private TextArea textArea = new TextArea();
+    private Properties properties;
+    private TimeTrackingService timeService;
+    private ObservableService gyroSerialListenerService;
 
-    private TimeTrackingService timeService = new TimeTrackingService(new ActivityFactory());
-    private ObservableService gyroSerialListenerService = new WorkdaySimulatorService();
-    //new GyroSerialListenerService(timeService);
+    public Main() {
+        try {
+            timeService = new TimeTrackingService(new ActivityFactory());
+            gyroSerialListenerService = //new WorkdaySimulatorService();
+                    new GyroSerialListenerService(timeService, readConfig().getProperty(PREFER_PORT_CONFIG));
+        } catch (IOException e) {
+            logger.error("Program error: ", e);
+        }
+    }
 
     @Override
     public void init() throws Exception {
@@ -119,9 +131,21 @@ public class Main extends Application {
     }
 
     private String formatDuration(Duration duration) {
-        return String.format("%dh : %02dm",
-                duration.toHours(),
-                duration.toMinutes());
+        long seconds = duration.getSeconds();
+        return String.format("%dh %02dm %02ds", seconds / 3600, (seconds % 3600) / 60, (seconds % 60));
+    }
+
+    private Properties readConfig() throws IOException {
+        try {
+            properties = new Properties();
+            InputStream inputStream = getClass().getClassLoader().getResourceAsStream(APP_CONFIG);
+            properties.load(inputStream);
+            return properties;
+
+        } catch (Exception ex){
+            logger.error("readConfig error: ", ex);
+            throw ex;
+        }
     }
 
     public static void main(String[] args) {

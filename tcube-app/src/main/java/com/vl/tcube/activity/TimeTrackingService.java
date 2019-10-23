@@ -1,6 +1,12 @@
 package com.vl.tcube.activity;
 
+import com.vl.tcube.Main;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +20,8 @@ public class TimeTrackingService {
     private Duration learnDuration;
     private Duration choresDuration;
     private Duration restDuration;
+    private LocalDateTime lastUpdate;
+    static final Logger logger = LoggerFactory.getLogger(TimeTrackingService.class);
 
     private ActivityFactory activityFactory;
 
@@ -42,9 +50,11 @@ public class TimeTrackingService {
         Activity previousActivity = getCurrentActivity();
         if(previousActivity.getType() != newActivityType){
             Activity newActivity = activityFactory.createActivity(newActivityType);
-            updatePreviousActivityStatistic(previousActivity, newActivity);
             activities.add(newActivity);
+        } else {
+            updateDuration(previousActivity.getType(), Duration.between(lastUpdate, LocalDateTime.now()));
         }
+        lastUpdate = LocalDateTime.now();
     }
 
     private void resetDurations() {
@@ -54,20 +64,9 @@ public class TimeTrackingService {
         restDuration = Duration.ofMinutes(0);
     }
 
-    private void recalculateActivitiesStatistics() {
-        Activity previousActivity = null;
-        for(Activity newActivity : activities){
-            if(previousActivity == null){
-                previousActivity = newActivity;
-            } else {
-                updatePreviousActivityStatistic(previousActivity, newActivity);
-            }
-        }
-    }
-
-    private void updatePreviousActivityStatistic(Activity previousActivity, Activity activity) {
-        Duration delta = Duration.between(previousActivity.getStartTime(), activity.getStartTime());
-        switch(previousActivity.getType()){
+    private void updateDuration(ActivityType activityType, Duration delta){
+        logger.debug("updateDuration activityType=" + activityType.name() + " delta=" + delta);
+        switch(activityType){
             case WORK:
                 workDuration =  workDuration.plus(delta);
                 break;
