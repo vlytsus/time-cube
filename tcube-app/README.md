@@ -21,6 +21,7 @@ mvn clean package
 Then copy following files to desired place:
 * run.bat
 * rxtxSerial.dll
+* log_analytics.xlsx
 * /target/tcube-1.0.0-SNAPSHOT.jar 
 * /target/lib
 
