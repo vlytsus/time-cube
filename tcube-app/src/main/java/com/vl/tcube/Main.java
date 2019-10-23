@@ -36,17 +36,14 @@ public class Main extends Application {
     private TimeTrackingService timeService;
     private ObservableService gyroSerialListenerService;
 
-    public Main() {
+    @Override
+    public void init() throws Exception {
+        super.init();
         AppConfig config = new AppConfig();
         timeService = new TimeTrackingService(new ActivityFactory());
         gyroSerialListenerService = //new WorkdaySimulatorService();
                 new GyroSerialListenerService(timeService, config.getPreferPort());
 
-    }
-
-    @Override
-    public void init() throws Exception {
-        super.init();
         gyroSerialListenerService.addCommunicationObserver(new CommunicationObserver() {
             @Override
             public void onCubePositionMessage(CubePositionMessage msg) {
@@ -128,8 +125,6 @@ public class Main extends Application {
         long seconds = duration.getSeconds();
         return String.format("%dh %02dm %02ds", seconds / 3600, (seconds % 3600) / 60, (seconds % 60));
     }
-
-
 
     public static void main(String[] args) {
         launch(args);
