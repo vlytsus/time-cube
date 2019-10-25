@@ -22,12 +22,12 @@ public class TextAreaAppender extends AppenderSkeleton {
     @Override
     protected void append(LoggingEvent loggingEvent) {
         if(textArea != null) {
+            String time = LocalDateTime.ofInstant(Instant.ofEpochMilli(loggingEvent.getTimeStamp()), ZoneId.systemDefault()).format(formatter);
             Platform.runLater(() -> {
-                String time = LocalDateTime.ofInstant(Instant.ofEpochMilli(loggingEvent.getTimeStamp()), ZoneId.systemDefault()).format(formatter);
                 if(textArea.getText().length() > MAX_TEXT_LENGTH) {
-                    textArea.setText("Clean up...");
+                    textArea.setText("Clean up...\r\n");
                 }
-                textArea.appendText("\r\n" +time + " : " + loggingEvent.getRenderedMessage());
+                textArea.appendText(time + " : " + loggingEvent.getRenderedMessage() + "\r\n");
             });
         }
     }

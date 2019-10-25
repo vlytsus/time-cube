@@ -14,6 +14,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,11 +30,8 @@ public class Main extends Application {
 
     static final Logger logger = LoggerFactory.getLogger(Main.class);
     static final Logger activityLog = LoggerFactory.getLogger("ACTIVITY_LOG");
-    private TextField choresField = new TextField ();
-    private TextField workField = new TextField ();
-    private TextField restField = new TextField ();
-    private TextField learnField = new TextField ();
-    private TextArea textArea = new TextArea();
+    private TextArea time = new TextArea();
+    private TextArea log = new TextArea();
     private TimeTrackingService timeService;
     private ObservableService gyroSerialListenerService;
 
@@ -43,9 +42,7 @@ public class Main extends Application {
         timeService = new TimeTrackingService(new ActivityFactory());
         gyroSerialListenerService = //new WorkdaySimulatorService();
                 new GyroSerialListenerService(timeService, config.getPreferPort());
-
-        textArea.setText("============================");
-        new TextAreaAppender().setTextArea(textArea);
+        new TextAreaAppender().setTextArea(log);
 
         gyroSerialListenerService.addCommunicationObserver(new CommunicationObserver() {
             @Override
@@ -56,10 +53,20 @@ public class Main extends Application {
                         timeService.startActivity(msg.getxPos(), msg.getyPos(), msg.getzPos());
                         Activity currentActivity = timeService.getCurrentActivity();
                         activityLog.info(currentActivity.getType().name());
-                        choresField.setText(formatDuration(timeService.getChoresDuration()));
-                        workField.setText(formatDuration(timeService.getWorkDuration()));
-                        restField.setText(formatDuration(timeService.getRestDuration()));
-                        learnField.setText(formatDuration(timeService.getLearnDuration()));
+                        time.setText("");
+                        time.appendText("  Work: ");
+                        time.appendText(formatDuration(timeService.getWorkDuration()));
+                        time.appendText("   Total: ");
+                        time.appendText(formatDuration(timeService.getTotalDuration()));
+                        time.appendText("\r\n");
+                        time.appendText("Chores: ");
+                        time.appendText(formatDuration(timeService.getChoresDuration()));
+                        time.appendText("\r\n");
+                        time.appendText(" Learn: ");
+                        time.appendText(formatDuration(timeService.getLearnDuration()));
+                        time.appendText("\r\n");
+                        time.appendText("  Rest: ");
+                        time.appendText(formatDuration(timeService.getRestDuration()));
                     }
                 });
             }
@@ -73,57 +80,30 @@ public class Main extends Application {
         StackPane root = new StackPane();
         /*Parent root = FXMLLoader.load(getClass().getResource("tcube.fxml"));*/
         primaryStage.setTitle("Time Cube");
-        primaryStage.setScene(new Scene(root, 600, 500));
+        primaryStage.setScene(new Scene(root, 440, 420));
+        primaryStage.setResizable(false);
 
         HBox hb = new HBox(10);
         VBox vb = new VBox(10);
         hb.getChildren().addAll(vb);
 
-        HBox workBox = new HBox();
-        workBox.setAlignment(Pos.CENTER);
-        vb.getChildren().addAll(workBox);
-        Label workLabel = new Label("Work:");
-        workLabel.setPrefWidth(55);
-        workBox.getChildren().addAll(workLabel, workField);
-
-        HBox choresBox = new HBox();
-        choresBox.setAlignment(Pos.CENTER);
-        vb.getChildren().addAll(choresBox);
-        Label choresLabel = new Label("Chores:");
-        choresLabel.setPrefWidth(55);
-        choresBox.getChildren().addAll(choresLabel, choresField);
-
-        HBox restBox = new HBox();
-        restBox.setAlignment(Pos.CENTER);
-        vb.getChildren().addAll(restBox);
-        Label restLabel = new Label("Rest:");
-        restLabel.setPrefWidth(55);
-        restBox.getChildren().addAll(restLabel, restField);
-
-        HBox learnBox = new HBox();
-        learnBox.setAlignment(Pos.CENTER);
-        vb.getChildren().addAll(learnBox);
-        Label learnLabel = new Label("Learn:");
-        learnLabel.setPrefWidth(55);
-        learnBox.getChildren().addAll(learnLabel, learnField);
-
-        HBox textBox = new HBox();
-        textBox.setAlignment(Pos.CENTER);
-        vb.getChildren().addAll(textBox);
-        textBox.setPrefWidth(450);
-        textArea.setPrefWidth(350);
-        textBox.getChildren().add(textArea);
+        log.setEditable(false);
+        time.setEditable(false);
+        time.setPrefHeight(90);
+        log.setPrefHeight(300);
+        time.setFont(Font.font("Monospaced", FontWeight.BOLD, 16));
+        log.setFont(Font.font("Monospaced", FontWeight.NORMAL, 14));
+        vb.getChildren().addAll(time, log);
 
         root.getChildren().add(hb);
+        hb.setAlignment(Pos.CENTER);
         vb.setAlignment(Pos.CENTER);
-
-        primaryStage.setWidth(450);
         primaryStage.show();
     }
 
     private String formatDuration(Duration duration) {
         long seconds = duration.getSeconds();
-        return String.format("%dh %02dm %02ds", seconds / 3600, (seconds % 3600) / 60, (seconds % 60));
+        return String.format("%d:%02d:%02d", seconds / 3600, (seconds % 3600) / 60, (seconds % 60));
     }
 
     public static void main(String[] args) {

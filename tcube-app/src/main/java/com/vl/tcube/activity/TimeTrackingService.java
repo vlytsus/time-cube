@@ -93,8 +93,7 @@ public class TimeTrackingService {
         return null;
     }
 
-    public Duration getWorkDuration() {
-        return workDuration;
+    public Duration getWorkDuration() { return workDuration;
     }
 
     public Duration getLearnDuration() {
@@ -107,5 +106,12 @@ public class TimeTrackingService {
 
     public Duration getRestDuration() {
         return restDuration;
+    }
+
+    public Duration getTotalDuration() {
+        return restDuration
+                .plus(choresDuration)
+                .plus(learnDuration)
+                .plus(workDuration);
     }
 }
