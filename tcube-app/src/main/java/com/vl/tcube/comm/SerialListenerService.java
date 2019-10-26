@@ -17,9 +17,9 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.StringTokenizer;
 
-public class GyroSerialListenerService extends Service<Void> implements ObservableService {
+public class SerialListenerService extends Service<Void> implements ObservableService {
 
-    static final Logger logger = LoggerFactory.getLogger(GyroSerialListenerService.class);
+    static final Logger logger = LoggerFactory.getLogger(SerialListenerService.class);
 
     public static final char MESSAGE_START_MARKER = '<';
     public static final int MESSAGE_MAX_LEN = 14;
@@ -33,7 +33,7 @@ public class GyroSerialListenerService extends Service<Void> implements Observab
     private Runnable updater;
     private String preferPort;
 
-    public GyroSerialListenerService(TimeTrackingService timeService, String preferPort){
+    public SerialListenerService(TimeTrackingService timeService, String preferPort){
         this.timeService = timeService;
         this.preferPort = preferPort;
     }

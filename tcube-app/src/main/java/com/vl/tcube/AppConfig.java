@@ -3,6 +3,8 @@ package com.vl.tcube;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -30,16 +32,25 @@ public class AppConfig {
         return properties.getProperty(PREFER_PORT_CONFIG);
     }
 
-    private Properties readConfig() throws IOException {
+    public static Properties readConfig() throws IOException {
+        InputStream inputStream = null;
         try {
-            properties = new Properties();
-            InputStream inputStream = getClass().getClassLoader().getResourceAsStream(APP_CONFIG);
+            try{
+                inputStream = new FileInputStream(APP_CONFIG);
+            } catch (FileNotFoundException e){
+                inputStream = AppConfig.class.getClassLoader().getResourceAsStream(APP_CONFIG);
+            }
+            Properties properties = new Properties();
             properties.load(inputStream);
             return properties;
 
         } catch (Exception ex){
             logger.error("readConfig error: ", ex);
             throw ex;
+        } finally {
+            if(inputStream != null){
+                inputStream.close();
+            }
         }
     }
 }

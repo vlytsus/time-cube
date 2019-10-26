@@ -1,11 +1,9 @@
 package com.vl.tcube.activity;
 
-import com.vl.tcube.Main;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

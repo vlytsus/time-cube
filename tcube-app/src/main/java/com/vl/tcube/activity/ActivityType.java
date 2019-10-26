@@ -1,6 +1,7 @@
 package com.vl.tcube.activity;
 
-import java.io.InputStream;
+import com.vl.tcube.AppConfig;
+
 import java.util.Properties;
 
 public enum ActivityType {
@@ -17,23 +18,22 @@ public enum ActivityType {
     private int yEnd;
     private int zStart;
     private int zEnd;
+    private String title;
 
     ActivityType() {
-        Properties prop = new Properties();
+        Properties prop;
         try {
-            InputStream inputStream = getClass().getClassLoader().getResourceAsStream(APP_CONFIG);
-            if(inputStream != null) {
-                prop.load(inputStream);
+            prop = AppConfig.readConfig();
+            xStart = readIntProperty(prop, name() + ".x.start");
+            xEnd = readIntProperty(prop, name() +   ".x.end");
 
-                xStart = readIntProperty(prop, this.name() + ".x.start");
-                xEnd = readIntProperty(prop, this.name() +   ".x.end");
+            yStart = readIntProperty(prop, name() + ".y.start");
+            yEnd = readIntProperty(prop, name() +   ".y.end");
 
-                yStart = readIntProperty(prop, this.name() + ".y.start");
-                yEnd = readIntProperty(prop, this.name() +   ".y.end");
+            zStart = readIntProperty(prop, name() + ".z.start");
+            zEnd = readIntProperty(prop, name() +   ".z.end");
 
-                zStart = readIntProperty(prop, this.name() + ".z.start");
-                zEnd = readIntProperty(prop, this.name() +   ".z.end");
-            }
+            title = prop.containsKey(name() + ".title") ? prop.getProperty(name() + ".title") : name();
 
         } catch (Exception ex){
             ex.printStackTrace();
@@ -58,6 +58,10 @@ public enum ActivityType {
             }
         }
         return UNDEFINED;
+    }
+
+    public String getTitle(){
+        return title;
     }
 
     public int getxStart() {
