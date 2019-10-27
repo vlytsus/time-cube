@@ -6,7 +6,6 @@ This project consist of Arduino and Java application which can run on desktop PC
 Arduino part just collects XYZ positions of the cube nad sends it so serial port once per second. Client is Java-based desktop application written using JavaFX for UI part. It contains whole business logic and is fully customizable to parse messages from serial port (USB) and track the statistic.
 
 ![Time Cube](time_cube.jpg?raw=true "Time Cube in action")
-![adxl345-accelerometer](https://howtomechatronics.com/wp-content/uploads/2019/03/Arduino-and-ADXL345-Accelerometer-Circuit-Diagram-768x426.png?raw=true "adxl345-accelerometer")
 
 Application writes comma-separated events log to time-log.csv file. It can be used by log_analytics.xlsx to present data as graphical reports in MS Excel.
 
