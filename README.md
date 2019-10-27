@@ -5,6 +5,8 @@ This project consist of Arduino and Java application which can run on desktop PC
 
 Arduino part just collects XYZ positions of the cube nad sends it so serial port once per second. Client is Java-based desktop application written using JavaFX for UI part. It contains whole business logic and is fully customizable to parse messages from serial port (USB) and track the statistic.
 
+You can find detailed instructions about how to build Time Cube in my Instructables project: https://www.instructables.com/id/Time-Cube-Arduino-Time-Tracking-Gadget/
+
 ![Time Cube](time_cube.jpg?raw=true "Time Cube in action")
 
 Application writes comma-separated events log to time-log.csv file. It can be used by log_analytics.xlsx to present data as graphical reports in MS Excel.
