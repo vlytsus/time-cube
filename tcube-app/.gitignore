@@ -2,4 +2,5 @@
 target
 *.iml
 time-log.csv
-
+dmp.hprof.analysis
+dmp.hprof
